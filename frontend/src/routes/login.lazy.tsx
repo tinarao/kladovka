@@ -2,67 +2,158 @@ import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { useForm } from '@tanstack/react-form';
 
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { Eye, EyeClosed } from 'lucide-react';
+import { Eye, EyeClosed, LoaderCircle, LogIn } from 'lucide-react';
 import { useState } from 'react';
+import { z } from 'zod';
+import axios from 'axios';
 
 export const Route = createLazyFileRoute('/login')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
+  const { toast } = useToast();
   const [passwordInputType, setPasswordInputType] = useState<
     'text' | 'password'
   >('password');
 
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      const schema = z.object({
+        email: z
+          .string({ message: 'Вы не указали электронную почту!' })
+          .email('Некорректный адрес электронной почты'),
+        password: z
+          .string({ message: 'Вы не указали пароль!' })
+          .min(10, 'Слишком короткий пароль')
+          .max(32, 'Слишком длинный пароль'),
+      });
+      const { error, success, data } = schema.safeParse(value);
+      if (!success) {
+        toast({
+          title: 'Форма заполнена неправильно!',
+          description: error.errors[0].message,
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const res = await axios.post('/api/auth/login', data, {
+        withCredentials: true,
+        validateStatus: () => true,
+      });
+
+      if (res.status !== 200) {
+        toast({
+          title: 'Ошибка!',
+          description: res.data.message,
+          variant: 'destructive',
+        });
+      }
+    },
+  });
+
   return (
-    <main className="h-screen flex flex-col items-center justify-center">
+    <main className="flex h-screen flex-col items-center justify-center bg-stone-100">
       <Card className="w-96">
         <CardHeader>
           <CardTitle>Авторизация</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div>
-            <Label className="font-medium">Электронная почта</Label>
-            <Input placeholder="Электронная почта" />
-          </div>
-          <div>
-            <Label className="font-medium">Пароль</Label>
-            <div className="flex items-center gap-x-1">
-              <Input type={passwordInputType} placeholder="Электронная почта" />
-              <Button
-                onClick={() => {
-                  if (passwordInputType === 'password') {
-                    setPasswordInputType('text');
-                    return;
-                  }
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+        >
+          <CardContent>
+            <form.Field name="email">
+              {(field) => (
+                <div>
+                  <Label className="font-medium">Электронная почта</Label>
+                  <Input
+                    required
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    placeholder="Электронная почта"
+                    disabled={form.state.isSubmitting}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                </div>
+              )}
+            </form.Field>
+            <form.Field name="password">
+              {(field) => (
+                <div>
+                  <Label className="font-medium">Пароль</Label>
+                  <div className="flex items-center gap-x-1">
+                    <Input
+                      required
+                      name={field.name}
+                      placeholder="Пароль"
+                      type={passwordInputType}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      disabled={form.state.isSubmitting}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        if (passwordInputType === 'password') {
+                          setPasswordInputType('text');
+                          return;
+                        }
 
-                  setPasswordInputType('password');
-                }}
-                size="icon"
-                variant="ghost"
-              >
-                {passwordInputType === 'password' ? (
-                  <EyeClosed className="size-4" />
-                ) : (
-                  <Eye className="size-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between">
-          <Button>Войти</Button>
-          <Button variant="link">Зарегистрироваться</Button>
-        </CardFooter>
+                        setPasswordInputType('password');
+                      }}
+                      size="icon"
+                      variant="ghost"
+                    >
+                      {passwordInputType === 'password' ? (
+                        <EyeClosed className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </form.Field>
+          </CardContent>
+          <CardFooter className="flex items-center justify-between">
+            <Button disabled={form.state.isSubmitting}>
+              {form.state.isSubmitting ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <LogIn className="size-4" />
+              )}
+              Войти
+            </Button>
+            <Button
+              disabled={form.state.isSubmitting}
+              type="button"
+              variant="link"
+            >
+              Зарегистрироваться
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </main>
   );
