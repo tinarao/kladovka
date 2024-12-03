@@ -21,12 +21,12 @@ type User struct {
 
 type Project struct {
 	ID        uint   `json:"id" gorm:"primaryKey"`
-	CreatorID uint   `json:"creatorId"`
+	CreatorId uint   `json:"creatorId"`
 	Name      string `json:"name"`
-	Files     []File `json:"files" gorm:"foreignKey:ProjectID"`
+	Files     []File `json:"files" gorm:"foreignKey:ProjectId"`
 }
 
 type File struct {
 	ID        uint `json:"id" gorm:"primaryKey"`
-	ProjectID uint `json:"projectId"`
+	ProjectId uint `json:"projectId"`
 }
