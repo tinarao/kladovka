@@ -26,12 +26,6 @@ type registerDTO struct {
 }
 
 func Login(c *gin.Context) {
-	// u, exists := c.Get("user")
-	// if exists {
-	// 	s := fmt.Sprintf("Вы уже зарегистрированы, %s!", u.(*db.User).FirstName)
-	// 	c.JSON(http.StatusBadRequest, gin.H{"message": s})
-	// 	return
-	// }
 	dto := &loginDTO{}
 	if err := c.ShouldBindJSON(dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Форма заполнена некорректно"})
@@ -122,5 +116,33 @@ func Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Вы успешно зарегистрированы!"})
+	return
+}
+
+func Verify(c *gin.Context) {
+	tok, err := c.Cookie("access_token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
+
+	user := &db.User{}
+	email, err := jwtoken.DecodeJwtToken(tok)
+	r := db.Client.Where("email = ?", email).First(&user)
+	if r.Error != nil {
+		c.SetCookie("access_token", "", 1, "", "localhost", false, true)
+		c.JSON(http.StatusNotFound, gin.H{"message": "User does not exist!"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "ok",
+		"user": gin.H{
+			"id":        user.ID,
+			"firstName": user.FirstName,
+			"lastName":  user.LastName,
+			"email":     user.Email,
+		},
+	})
 	return
 }
