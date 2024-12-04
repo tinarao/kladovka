@@ -1,18 +1,28 @@
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
-import { Outlet, createRootRoute } from '@tanstack/react-router';
+import {
+  Outlet,
+  createRootRouteWithContext,
+  useRouteContext,
+} from '@tanstack/react-router';
 import { Toaster } from '@/components/ui/toaster';
 import '../globals.css';
+import axios from 'axios';
 
-export const Route = createRootRoute({
+interface KladowkaContext {
+  auth?: UserStore;
+}
+
+export const Route = createRootRouteWithContext<KladowkaContext>()({
   component: RootComponent,
 });
+
+axios.defaults.withCredentials = true;
+axios.defaults.validateStatus = () => true;
 
 function RootComponent() {
   return (
     <>
       <Toaster />
       <Outlet />
-      <TanStackRouterDevtools position="bottom-right" />
     </>
   );
 }

@@ -1,38 +1,33 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { LayoutDashboard, LogInIcon } from 'lucide-react';
-import { useAuth } from '../hooks/auth';
+import { LayoutDashboardIcon, LogInIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/auth';
 
 export const Route = createFileRoute('/')({
   component: HomeComponent,
 });
 
 function HomeComponent() {
-  const { isAuthenticated } = useAuth();
+  const { user } = useAuth();
+
   return (
     <>
-      <header className="border-b py-2 bg-neutral-100">
-        <div className="flex items-center justify-end container mx-auto">
-          <Button variant="outline" asChild>
-            <Link to="/login">
-              <LogInIcon className="size-2" /> Войти
-            </Link>
-          </Button>
-          {/* {isAuthenticated ? (
-            <Button component={Link} to="/login" variant="filled">
-              Панель управления
+      <header className="border-b bg-neutral-100 py-2">
+        <div className="container mx-auto flex items-center justify-end">
+          {user ? (
+            <Button size="sm" variant="outline" asChild>
+              <Link to="/dashboard">
+                <LayoutDashboardIcon className="size-2" /> Панель управления
+              </Link>
             </Button>
           ) : (
-            <Button
-              leftSection={<LogInIcon className="size-4" />}
-              component={Link}
-              to="/login"
-              variant="filled"
-            >
-              Войти
+            <Button size="sm" variant="outline" asChild>
+              <Link to="/login">
+                <LogInIcon className="size-2" /> Войти
+              </Link>
             </Button>
-          )} */}
+          )}
         </div>
       </header>
     </>

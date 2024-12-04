@@ -11,11 +11,12 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from '@tanstack/react-form';
 
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, redirect } from '@tanstack/react-router';
 import { Eye, EyeClosed, LoaderCircle, LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { z } from 'zod';
 import axios from 'axios';
+import { UserFields } from '@/lib/validators/user';
 
 export const Route = createLazyFileRoute('/login')({
   component: RouteComponent,
@@ -34,13 +35,8 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       const schema = z.object({
-        email: z
-          .string({ message: 'Вы не указали электронную почту!' })
-          .email('Некорректный адрес электронной почты'),
-        password: z
-          .string({ message: 'Вы не указали пароль!' })
-          .min(10, 'Слишком короткий пароль')
-          .max(32, 'Слишком длинный пароль'),
+        email: UserFields.email,
+        password: UserFields.password,
       });
       const { error, success, data } = schema.safeParse(value);
       if (!success) {
@@ -52,10 +48,7 @@ function RouteComponent() {
         return;
       }
 
-      const res = await axios.post('/api/auth/login', data, {
-        withCredentials: true,
-        validateStatus: () => true,
-      });
+      const res = await axios.post('/api/auth/login', data);
 
       if (res.status !== 200) {
         toast({
@@ -63,7 +56,17 @@ function RouteComponent() {
           description: res.data.message,
           variant: 'destructive',
         });
+        return;
       }
+
+      toast({
+        title: 'Вы успешно авторизованы!',
+        variant: 'good',
+      });
+
+      redirect({
+        to: '/dashboard',
+      });
     },
   });
 
@@ -149,8 +152,9 @@ function RouteComponent() {
               disabled={form.state.isSubmitting}
               type="button"
               variant="link"
+              asChild
             >
-              Зарегистрироваться
+              <Link to="/register">У меня нет аккаунта</Link>
             </Button>
           </CardFooter>
         </form>

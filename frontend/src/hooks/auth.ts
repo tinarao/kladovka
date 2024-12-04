@@ -1,22 +1,23 @@
 import { create } from "zustand"
-import { persist, createJSONStorage } from 'zustand/middleware'
+import { persist } from "zustand/middleware"
 
 interface AuthStore {
+    user?: UserStore
     isAuthenticated: boolean,
-    verify: () => void;
+    setUser: (u: UserStore) => void
 }
 
 export const useAuth = create<AuthStore>()(
     persist(
         (set, get) => ({
             isAuthenticated: false,
-            verify: async () => {
-                // request to /me
+            user: undefined,
+            setUser: (u) => {
+                set({ isAuthenticated: true, user: u })
             }
         }),
         {
-            name: 'auth-store',
-            storage: createJSONStorage(() => sessionStorage),
+            name: 'u'
         }
     )
 )
