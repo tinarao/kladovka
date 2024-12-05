@@ -24,8 +24,11 @@ func main() {
 	a.POST("/login", auth.Login)
 	a.POST("/register", auth.Register)
 
-	v.GET("/projects", projects.GetMyProjects)
-	v.GET("/projects/:id")
+	// Products
+	p := v.Group("/projects")
+	p.GET("/", projects.GetMyProjects)
+	p.GET("/:id")
+	p.POST("/", projects.Create)
 
 	r.Run()
 }

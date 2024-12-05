@@ -51,7 +51,9 @@ func Login(c *gin.Context) {
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password)); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Неверный пароль!"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Неверный пароль!",
+		})
 		return
 	}
 
@@ -63,7 +65,15 @@ func Login(c *gin.Context) {
 	}
 
 	c.SetCookie("access_token", *token, 0, "/", "localhost", false, true)
-	c.JSON(http.StatusOK, gin.H{"message": "Авторизация прошла успешно!", "email": dto.Email})
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Авторизация прошла успешно!",
+		"user": gin.H{
+			"id":        user.ID,
+			"firstName": user.FirstName,
+			"lastName":  user.LastName,
+			"email":     user.Email,
+		},
+	})
 	return
 }
 

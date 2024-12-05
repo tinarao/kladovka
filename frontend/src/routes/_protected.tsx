@@ -47,7 +47,6 @@ function RouteComponent() {
 
   useEffect(() => {
     setUser(user);
-    console.log('set user to hoockk');
   }, [user]);
 
   return <Outlet />;

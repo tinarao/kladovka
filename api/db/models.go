@@ -24,7 +24,7 @@ type Project struct {
 	CreatorId   uint    `json:"creatorId"`
 	Name        string  `json:"name"`
 	Files       []File  `json:"files" gorm:"foreignKey:ProjectId"`
-	MbSizeLimit float64 `json:"mbSizeLimit" gorm:"default:0.0"`
+	MbSizeLimit float64 `json:"mbSizeLimit" gorm:"default:1024.0"`
 	MbOccupied  float64 `json:"mbOccupied" gorm:"default:0.0"`
 	PrivateKey  string  `json:"-"`
 	PublicKey   string  `json:"publicKey"`

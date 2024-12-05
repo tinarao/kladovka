@@ -7,19 +7,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import DashboardTopPanel from '@/components/DashboardTopPanel';
-import { createLazyFileRoute } from '@tanstack/react-router';
+import { createLazyFileRoute, redirect } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useSidebar } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useForm } from '@tanstack/react-form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { UserFields } from '@/lib/validators/user';
 import { ProjectFields } from '@/lib/validators/projects';
-import { ZodError } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { LoaderCircle, Save } from 'lucide-react';
+import axios from 'axios';
 
 export const Route = createLazyFileRoute(
   '/_protected/_dashboard/dashboard/create-project',
@@ -35,23 +33,34 @@ function RouteComponent() {
     defaultValues: {
       name: '',
     },
-    onSubmit: ({ value }) => {
-      try {
-        ProjectFields.name.parse(value.name);
-        toast({
-          title: 'Успешно!',
-          description: `Проект ${value.name} успешно создан!`,
-          variant: 'good',
-        });
-      } catch (error) {
-        const err = error as ZodError;
+    onSubmit: async ({ value }) => {
+      const { data, success, error } = ProjectFields.name.safeParse(value.name);
+      if (!success) {
         toast({
           title: 'Ошибка формы',
-          description: err.errors[0].message,
+          description: error.errors[0].message,
           variant: 'destructive',
         });
         return;
       }
+
+      const res = await axios.post('/api/v/projects', { name: data });
+      if (res.status !== 201) {
+        toast({
+          title: 'Ошибка при создании формы',
+          description: res.data.message,
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
+      toast({
+        title: 'Успешно!',
+        description: `Проект ${value.name} успешно создан!`,
+        variant: 'good',
+      });
+      redirect({ to: '/dashboard' });
     },
   });
 

@@ -9,7 +9,7 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import ProfileDropdown from './ProfileDropdown';
-import { MoreHorizontal, Plus } from 'lucide-react';
+import { LoaderCircle, MoreHorizontal, Plus } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import {
   DropdownMenu,
@@ -17,8 +17,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
+import { Button } from './ui/button';
 
-export function DashboardSidebar({ user }: { user: UserStore }) {
+export function DashboardSidebar({ user }: { user?: UserStore }) {
   return (
     <Sidebar>
       <SidebarHeader className="flex items-center justify-center bg-stone-100">
@@ -49,7 +50,13 @@ export function DashboardSidebar({ user }: { user: UserStore }) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className="bg-stone-100">
-        <ProfileDropdown user={user} />
+        {user ? (
+          <ProfileDropdown user={user} />
+        ) : (
+          <Button>
+            <LoaderCircle className="size-2" /> Загрузка...
+          </Button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

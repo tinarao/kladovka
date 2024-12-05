@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import axios from 'axios';
 import { UserFields } from '@/lib/validators/user';
+import { useAuth } from '@/hooks/auth';
 
 export const Route = createLazyFileRoute('/login')({
   component: RouteComponent,
@@ -24,6 +25,7 @@ export const Route = createLazyFileRoute('/login')({
 
 function RouteComponent() {
   const { toast } = useToast();
+  const { setUser } = useAuth();
   const [passwordInputType, setPasswordInputType] = useState<
     'text' | 'password'
   >('password');
@@ -38,17 +40,17 @@ function RouteComponent() {
         email: UserFields.email,
         password: UserFields.password,
       });
-      const { error, success, data } = schema.safeParse(value);
-      if (!success) {
+      const formdata = schema.safeParse(value);
+      if (!formdata.success) {
         toast({
           title: 'Форма заполнена неправильно!',
-          description: error.errors[0].message,
+          description: formdata.error.errors[0].message,
           variant: 'destructive',
         });
         return;
       }
 
-      const res = await axios.post('/api/auth/login', data);
+      const res = await axios.post('/api/auth/login', formdata.data);
 
       if (res.status !== 200) {
         toast({
@@ -59,14 +61,29 @@ function RouteComponent() {
         return;
       }
 
+      const userData = z
+        .object({
+          id: UserFields.id,
+          firstName: UserFields.firstName,
+          lastName: UserFields.lastName,
+          email: UserFields.email,
+        })
+        .safeParse(res.data.user);
+      if (!userData.success) {
+        console.log(res.data);
+        console.error('Validation error', userData.error);
+        return;
+        // ??
+      }
+
+      setUser(userData.data);
+
       toast({
         title: 'Вы успешно авторизованы!',
         variant: 'good',
       });
 
-      redirect({
-        to: '/dashboard',
-      });
+      window.location.replace('/dashboard');
     },
   });
 
