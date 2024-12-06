@@ -1,10 +1,5 @@
 import { useAuth } from '@/hooks/auth';
-import {
-  Link,
-  Outlet,
-  createFileRoute,
-  useRouteContext,
-} from '@tanstack/react-router';
+import { Link, Outlet, createFileRoute } from '@tanstack/react-router';
 import axios from 'axios';
 import { z } from 'zod';
 import { projectSchema } from '@/lib/validators/projects';
@@ -19,8 +14,7 @@ export const Route = createFileRoute('/_protected/_dashboard')({
       .array(projectSchema)
       .safeParse(res.data.projects);
     if (!success) {
-      console.error('Ошибка валидации списка проектов');
-      console.error(error.errors);
+      console.error('Ошибка валидации списка проектов', error.errors);
       return {
         projects: [],
       };

@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
-import { createLazyFileRoute, redirect } from '@tanstack/react-router';
+import { Link, createLazyFileRoute, redirect } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { useForm } from '@tanstack/react-form';
 import { Label } from '@/components/ui/label';
@@ -104,8 +104,12 @@ function RouteComponent() {
               )}
               Создать
             </Button>
-            <Button disabled={form.state.isSubmitting} variant="destructive">
-              Отмена
+            <Button
+              type="button"
+              disabled={form.state.isSubmitting}
+              variant="destructive"
+            >
+              <Link to="/dashboard">Отмена</Link>
             </Button>
           </CardFooter>
         </form>

@@ -6,6 +6,7 @@ import (
 	"kladovka-api/middleware"
 	"kladovka-api/modules/auth"
 	"kladovka-api/modules/projects"
+	"kladovka-api/modules/tokens"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,6 +30,9 @@ func main() {
 	p.GET("/", projects.GetMyProjects)
 	p.GET("/:id", projects.GetProjectById)
 	p.POST("/", projects.Create)
+
+	t := v.Group("/tokens")
+	t.GET("/:id", tokens.GetProjectTokens)
 
 	r.Run()
 }

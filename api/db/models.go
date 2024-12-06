@@ -28,6 +28,7 @@ type Project struct {
 	MbOccupied  float64 `json:"mbOccupied" gorm:"default:0.0"`
 	PrivateKey  string  `json:"-"`
 	PublicKey   string  `json:"publicKey"`
+	Token       string  `json:"-"`
 }
 
 type File struct {

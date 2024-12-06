@@ -27,7 +27,7 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { project, filesCount } = Route.useLoaderData();
+  const { project } = Route.useLoaderData();
 
   return (
     <>

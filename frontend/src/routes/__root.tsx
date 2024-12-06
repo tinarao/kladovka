@@ -52,12 +52,14 @@ export const Route = createRootRouteWithContext<KladowkaContext>()({
 });
 
 function RootComponent() {
-  const { setUser } = useAuth();
+  const { setUser, clear: clearUser } = useAuth();
   const { user } = Route.useRouteContext();
 
   useEffect(() => {
     if (user) {
       setUser(user);
+    } else {
+      clearUser();
     }
   }, [user]);
 

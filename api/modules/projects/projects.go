@@ -3,6 +3,7 @@ package projects
 import (
 	"errors"
 	"kladovka-api/db"
+	"kladovka-api/internal/keys"
 	"kladovka-api/internal/validator"
 	"log/slog"
 	"net/http"
@@ -56,12 +57,15 @@ func GetProjectById(c *gin.Context) {
 		return
 	}
 
+	var fc int64 = 0
+	db.Client.Model(&db.File{}).Where("project_id = ?", id).Count(&fc)
+
 	if project.CreatorId != u.ID {
 		c.JSON(http.StatusForbidden, gin.H{"message": "Доступ запрещён"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"project": project})
+	c.JSON(http.StatusOK, gin.H{"project": project, "filesCount": fc})
 	return
 }
 
@@ -86,11 +90,24 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	k, err := keys.GetKeys()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Ошибка при создании проекта"})
+		return
+	}
+
+	token, err := keys.Encrypt(u.Email, &k.PublicKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Ошибка при создании проекта"})
+		return
+	}
+
 	p := &db.Project{
 		Name:       dto.Name,
 		CreatorId:  u.ID,
-		PublicKey:  "public",
-		PrivateKey: "private", // MAKE!
+		PublicKey:  string(k.PublicKey),
+		PrivateKey: string(k.PrivateKey),
+		Token:      string(token),
 	}
 	if err := db.Client.Create(&p).Error; err != nil {
 		slog.Error("failed to create project", err)
