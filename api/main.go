@@ -27,7 +27,7 @@ func main() {
 	// Products
 	p := v.Group("/projects")
 	p.GET("/", projects.GetMyProjects)
-	p.GET("/:id")
+	p.GET("/:id", projects.GetProjectById)
 	p.POST("/", projects.Create)
 
 	r.Run()

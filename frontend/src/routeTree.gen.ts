@@ -17,6 +17,7 @@ import { Route as ProtectedImport } from './routes/_protected'
 import { Route as IndexImport } from './routes/index'
 import { Route as ProtectedDashboardImport } from './routes/_protected/_dashboard'
 import { Route as ProtectedDashboardDashboardIndexImport } from './routes/_protected/_dashboard/dashboard/index'
+import { Route as ProtectedDashboardDashboardProjectIdImport } from './routes/_protected/_dashboard/dashboard/$projectId'
 
 // Create Virtual Routes
 
@@ -74,6 +75,13 @@ const ProtectedDashboardDashboardCreateProjectLazyRoute =
     ),
   )
 
+const ProtectedDashboardDashboardProjectIdRoute =
+  ProtectedDashboardDashboardProjectIdImport.update({
+    id: '/dashboard/$projectId',
+    path: '/dashboard/$projectId',
+    getParentRoute: () => ProtectedDashboardRoute,
+  } as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -113,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedDashboardImport
       parentRoute: typeof ProtectedImport
     }
+    '/_protected/_dashboard/dashboard/$projectId': {
+      id: '/_protected/_dashboard/dashboard/$projectId'
+      path: '/dashboard/$projectId'
+      fullPath: '/dashboard/$projectId'
+      preLoaderRoute: typeof ProtectedDashboardDashboardProjectIdImport
+      parentRoute: typeof ProtectedDashboardImport
+    }
     '/_protected/_dashboard/dashboard/create-project': {
       id: '/_protected/_dashboard/dashboard/create-project'
       path: '/dashboard/create-project'
@@ -133,11 +148,14 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface ProtectedDashboardRouteChildren {
+  ProtectedDashboardDashboardProjectIdRoute: typeof ProtectedDashboardDashboardProjectIdRoute
   ProtectedDashboardDashboardCreateProjectLazyRoute: typeof ProtectedDashboardDashboardCreateProjectLazyRoute
   ProtectedDashboardDashboardIndexRoute: typeof ProtectedDashboardDashboardIndexRoute
 }
 
 const ProtectedDashboardRouteChildren: ProtectedDashboardRouteChildren = {
+  ProtectedDashboardDashboardProjectIdRoute:
+    ProtectedDashboardDashboardProjectIdRoute,
   ProtectedDashboardDashboardCreateProjectLazyRoute:
     ProtectedDashboardDashboardCreateProjectLazyRoute,
   ProtectedDashboardDashboardIndexRoute: ProtectedDashboardDashboardIndexRoute,
@@ -163,6 +181,7 @@ export interface FileRoutesByFullPath {
   '': typeof ProtectedDashboardRouteWithChildren
   '/login': typeof LoginLazyRoute
   '/register': typeof RegisterLazyRoute
+  '/dashboard/$projectId': typeof ProtectedDashboardDashboardProjectIdRoute
   '/dashboard/create-project': typeof ProtectedDashboardDashboardCreateProjectLazyRoute
   '/dashboard': typeof ProtectedDashboardDashboardIndexRoute
 }
@@ -172,6 +191,7 @@ export interface FileRoutesByTo {
   '': typeof ProtectedDashboardRouteWithChildren
   '/login': typeof LoginLazyRoute
   '/register': typeof RegisterLazyRoute
+  '/dashboard/$projectId': typeof ProtectedDashboardDashboardProjectIdRoute
   '/dashboard/create-project': typeof ProtectedDashboardDashboardCreateProjectLazyRoute
   '/dashboard': typeof ProtectedDashboardDashboardIndexRoute
 }
@@ -183,6 +203,7 @@ export interface FileRoutesById {
   '/login': typeof LoginLazyRoute
   '/register': typeof RegisterLazyRoute
   '/_protected/_dashboard': typeof ProtectedDashboardRouteWithChildren
+  '/_protected/_dashboard/dashboard/$projectId': typeof ProtectedDashboardDashboardProjectIdRoute
   '/_protected/_dashboard/dashboard/create-project': typeof ProtectedDashboardDashboardCreateProjectLazyRoute
   '/_protected/_dashboard/dashboard/': typeof ProtectedDashboardDashboardIndexRoute
 }
@@ -194,6 +215,7 @@ export interface FileRouteTypes {
     | ''
     | '/login'
     | '/register'
+    | '/dashboard/$projectId'
     | '/dashboard/create-project'
     | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
@@ -202,6 +224,7 @@ export interface FileRouteTypes {
     | ''
     | '/login'
     | '/register'
+    | '/dashboard/$projectId'
     | '/dashboard/create-project'
     | '/dashboard'
   id:
@@ -211,6 +234,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/_protected/_dashboard'
+    | '/_protected/_dashboard/dashboard/$projectId'
     | '/_protected/_dashboard/dashboard/create-project'
     | '/_protected/_dashboard/dashboard/'
   fileRoutesById: FileRoutesById
@@ -265,9 +289,14 @@ export const routeTree = rootRoute
       "filePath": "_protected/_dashboard.tsx",
       "parent": "/_protected",
       "children": [
+        "/_protected/_dashboard/dashboard/$projectId",
         "/_protected/_dashboard/dashboard/create-project",
         "/_protected/_dashboard/dashboard/"
       ]
+    },
+    "/_protected/_dashboard/dashboard/$projectId": {
+      "filePath": "_protected/_dashboard/dashboard/$projectId.tsx",
+      "parent": "/_protected/_dashboard"
     },
     "/_protected/_dashboard/dashboard/create-project": {
       "filePath": "_protected/_dashboard/dashboard/create-project.lazy.tsx",

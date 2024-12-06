@@ -22,3 +22,5 @@ export const projectSchema = z.object({
     mbOccupied: ProjectFields.mbOccupied,
     publicKey: ProjectFields.publicKey,
 })
+
+export type Project = z.infer<typeof projectSchema>

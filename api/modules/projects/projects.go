@@ -1,6 +1,7 @@
 package projects
 
 import (
+	"errors"
 	"kladovka-api/db"
 	"kladovka-api/internal/validator"
 	"log/slog"
@@ -31,6 +32,36 @@ func GetMyProjects(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"projects": projects})
+	return
+}
+
+func GetProjectById(c *gin.Context) {
+	id := c.Param("id")
+	uctx, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Ошибка авторизации. Войдите в аккаунт и попробуйте ещё раз"})
+		return
+	}
+
+	u := uctx.(*db.User)
+	project := &db.Project{}
+	r := db.Client.Where("id = ?", id).First(&project)
+	if r.Error != nil {
+		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"message": "Проект не найден"})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Возникла внутренняя ошибка сервера"})
+		return
+	}
+
+	if project.CreatorId != u.ID {
+		c.JSON(http.StatusForbidden, gin.H{"message": "Доступ запрещён"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"project": project})
 	return
 }
 
