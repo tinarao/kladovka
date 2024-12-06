@@ -8,7 +8,7 @@ import (
 
 type User struct {
 	ID        uint           `json:"id" gorm:"primaryKey"`
-	Projects  []Project      `json:"projects" gorm:"foreignKey:CreatorId"`
+	Projects  []Project      `json:"projects" gorm:"foreignKey:CreatorId" gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 	LatestIP  *string        `json:"latestIp"`
 	FirstName string         `json:"firstName"`
 	LastName  string         `json:"lastName"`

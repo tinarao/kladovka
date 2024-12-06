@@ -1,7 +1,6 @@
 package projects
 
 import (
-	"errors"
 	"kladovka-api/db"
 	"kladovka-api/internal/validator"
 	"log/slog"
@@ -23,13 +22,11 @@ func GetMyProjects(c *gin.Context) {
 	}
 
 	u := uctx.(*db.User)
+	projects := &[]db.Project{}
 
-	var projects []db.Project
-
-	err := db.Client.Model(&db.User{}).Where("id = ?", u.ID).Association("Projects").Find(&projects)
-	if err != nil && !(errors.Is(err, gorm.ErrRecordNotFound)) {
-		slog.Error("failed to recieve projects list", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Ошибка при получении списка проектов"})
+	dbr := db.Client.Where("creator_id = ?", u.ID).Find(&projects)
+	if dbr.Error != nil && dbr.Error != gorm.ErrRecordNotFound {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Возникла ошибка сервера при получении проектов"})
 		return
 	}
 
