@@ -1,14 +1,15 @@
 import { useAuth } from '@/hooks/auth';
 import {
+  Link,
   Outlet,
   createFileRoute,
   useRouteContext,
 } from '@tanstack/react-router';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/DashboardSidebar';
 import axios from 'axios';
 import { z } from 'zod';
 import { projectSchema } from '@/lib/validators/projects';
+import ProfileDropdown from '../../components/ProfileDropdown';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/_protected/_dashboard')({
   component: RouteComponent,
@@ -36,11 +37,23 @@ function RouteComponent() {
   const { user } = useAuth();
 
   return (
-    <SidebarProvider>
-      <DashboardSidebar user={user!} />
-      <main className="container mx-auto flex h-screen flex-col">
+    <div className="container mx-auto flex h-screen flex-col">
+      <header className="flex items-center justify-between border-b py-2 text-xl font-medium">
+        Кладовка
+        <div className="flex">
+          <nav>
+            <Button variant="link">
+              <Link to="/dashboard">Проекты</Link>
+            </Button>
+          </nav>
+          <div className="ml-2 border-l pl-2">
+            <ProfileDropdown user={user!} />
+          </div>
+        </div>
+      </header>
+      <main className="flex-1 py-2">
         <Outlet />
       </main>
-    </SidebarProvider>
+    </div>
   );
 }

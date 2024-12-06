@@ -2,7 +2,7 @@ import DashboardTopPanel from '@/components/DashboardTopPanel';
 import ProjectCard from '@/components/ProjectCard';
 import { Button } from '@/components/ui/button';
 import { Link, createFileRoute, useRouteContext } from '@tanstack/react-router';
-import { FolderPlus, FolderX } from 'lucide-react';
+import { FolderPlus, FolderX, Plus } from 'lucide-react';
 import { useEffect } from 'react';
 
 export const Route = createFileRoute('/_protected/_dashboard/dashboard/')({
@@ -19,9 +19,20 @@ function RouteComponent() {
   }, []);
 
   return (
-    <div className="flex-1 p-2">
+    <>
       <DashboardTopPanel title="Проекты" />
-      <div>
+      <div className="flex items-center gap-x-2">
+        <Button
+          asChild
+          title="Создать новый проект"
+          variant="outline"
+          size="icon"
+          className="size-5"
+        >
+          <Link to="/dashboard/create-project">
+            <Plus className="size-2" />
+          </Link>
+        </Button>
         <p className="text-sm font-medium text-neutral-500">
           Всего: {projectsCount}
         </p>
@@ -40,10 +51,10 @@ function RouteComponent() {
       ) : (
         <div className="grid grid-cols-4 gap-2 py-4">
           {projects.map((p) => (
-            <ProjectCard project={p} className="col-span-1" />
+            <ProjectCard key={p.id} project={p} className="col-span-1" />
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

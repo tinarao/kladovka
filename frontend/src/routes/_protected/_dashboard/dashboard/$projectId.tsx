@@ -7,7 +7,7 @@ export const Route = createFileRoute(
   '/_protected/_dashboard/dashboard/$projectId',
 )({
   component: RouteComponent,
-  async beforeLoad(ctx) {
+  async loader(ctx) {
     const res = await axios(`/api/v/projects/${ctx.params.projectId}`);
     if (res.status !== 200) {
       throw redirect({ to: '/dashboard' });
@@ -21,16 +21,18 @@ export const Route = createFileRoute(
 
     return {
       project: data,
+      filesCount: res.data.filesCount,
     };
   },
 });
 
 function RouteComponent() {
-  const { project } = Route.useRouteContext();
+  const { project, filesCount } = Route.useLoaderData();
 
   return (
-    <div className="flex-1 p-2">
+    <>
       <DashboardTopPanel title={project.name} />
-    </div>
+      <div></div>
+    </>
   );
 }

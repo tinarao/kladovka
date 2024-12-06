@@ -12,42 +12,15 @@ import { z } from 'zod';
 
 export const Route = createFileRoute('/_protected')({
   component: RouteComponent,
-  beforeLoad: async (ctx) => {
-    const res = await axios('/api/auth/verify');
-    if (res.status !== 200) {
-      throw redirect({ to: '/login' });
-    }
-
-    const { error, data, success } = z
-      .object({
-        id: UserFields.id,
-        firstName: UserFields.firstName,
-        lastName: UserFields.lastName,
-        email: UserFields.email,
-      })
-      .safeParse(res.data.user);
-    if (!success) {
-      console.error('Validation error', error);
-      throw redirect({ to: '/login' });
-    }
-
-    ctx.context.auth = data;
-
-    return {
-      user: ctx.context.auth,
-    };
-  },
 });
 
 function RouteComponent() {
-  const { setUser } = useAuth();
-  const { user } = useRouteContext({
-    from: '/_protected',
-  });
+  const { user } = useAuth();
 
   useEffect(() => {
-    setUser(user);
-  }, [user]);
-
+    if (!user) {
+      throw redirect({ to: '/login' });
+    }
+  }, []);
   return <Outlet />;
 }

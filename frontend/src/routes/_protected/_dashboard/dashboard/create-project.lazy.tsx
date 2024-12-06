@@ -8,8 +8,6 @@ import {
 } from '@/components/ui/card';
 
 import { createLazyFileRoute, redirect } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { useSidebar } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { useForm } from '@tanstack/react-form';
 import { Label } from '@/components/ui/label';
@@ -26,7 +24,6 @@ export const Route = createLazyFileRoute(
 });
 
 function RouteComponent() {
-  const { setOpen } = useSidebar();
   const { toast } = useToast();
 
   const form = useForm({
@@ -64,12 +61,8 @@ function RouteComponent() {
     },
   });
 
-  useEffect(() => {
-    setOpen(false);
-  }, []);
-
   return (
-    <div className="flex flex-1 items-center justify-center">
+    <div className="flex h-full items-center justify-center">
       <Card className="w-96">
         <CardHeader>
           <CardTitle>Создать проект</CardTitle>
