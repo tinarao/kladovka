@@ -102,12 +102,16 @@ func Create(c *gin.Context) {
 		return
 	}
 
+	tokenStr := keys.MarshalRSA(token)
+	publicKeyStr := keys.MarshalRSA(k.PublicKey)
+	privateKeyStr := keys.MarshalRSA(k.PrivateKey)
+
 	p := &db.Project{
 		Name:       dto.Name,
 		CreatorId:  u.ID,
-		PublicKey:  string(k.PublicKey),
-		PrivateKey: string(k.PrivateKey),
-		Token:      string(token),
+		PublicKey:  publicKeyStr,
+		PrivateKey: privateKeyStr,
+		Token:      tokenStr,
 	}
 	if err := db.Client.Create(&p).Error; err != nil {
 		slog.Error("failed to create project", err)
