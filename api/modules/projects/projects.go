@@ -57,6 +57,16 @@ func GetProjectById(c *gin.Context) {
 		return
 	}
 
+	var files []*db.File
+	r = db.Client.Model(&db.File{}).Where("project_id = ?", id).Find(&files)
+	if r.Error != nil && errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		files = make([]*db.File, 0)
+	}
+	if r.Error != nil && !errors.Is(r.Error, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Возникла внутренняя ошибка сервера"})
+		return
+	}
+
 	var fc int64 = 0
 	db.Client.Model(&db.File{}).Where("project_id = ?", id).Count(&fc)
 
@@ -65,7 +75,7 @@ func GetProjectById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"project": project, "filesCount": fc})
+	c.JSON(http.StatusOK, gin.H{"project": project, "filesCount": fc, "files": files})
 	return
 }
 

@@ -35,7 +35,7 @@ type Project struct {
 type File struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	ProjectId uint      `json:"projectId"`
-	Name      string    `json:"string"`
+	Name      string    `json:"name"`
 	Mb        float64   `json:"mb"`
 	Location  string    `json:"location"`
 	CreatedAt time.Time `json:"createdAt"`
