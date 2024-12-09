@@ -29,6 +29,6 @@ func GetProjectTokens(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": project.Token})
+	c.JSON(http.StatusOK, gin.H{"token": project.Token, "publicKey": project.PublicKey})
 	return
 }

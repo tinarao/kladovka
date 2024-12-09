@@ -20,18 +20,23 @@ type User struct {
 }
 
 type Project struct {
-	ID          uint    `json:"id" gorm:"primaryKey"`
-	CreatorId   uint    `json:"creatorId"`
-	Name        string  `json:"name"`
-	Files       []File  `json:"files" gorm:"foreignKey:ProjectId"`
-	MbSizeLimit float64 `json:"mbSizeLimit" gorm:"default:1024.0"`
-	MbOccupied  float64 `json:"mbOccupied" gorm:"default:0.0"`
-	PrivateKey  string  `json:"-"`
-	PublicKey   string  `json:"publicKey"`
-	Token       string  `json:"-"`
+	ID          uint      `json:"id" gorm:"primaryKey"`
+	CreatorId   uint      `json:"creatorId"`
+	Name        string    `json:"name"`
+	Files       []File    `json:"files" gorm:"foreignKey:ProjectId"`
+	MbSizeLimit float64   `json:"mbSizeLimit" gorm:"default:1024.0"`
+	MbOccupied  float64   `json:"mbOccupied" gorm:"default:0.0"`
+	PrivateKey  string    `json:"-"`
+	PublicKey   string    `json:"publicKey"`
+	Token       string    `json:"-"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 type File struct {
-	ID        uint `json:"id" gorm:"primaryKey"`
-	ProjectId uint `json:"projectId"`
+	ID        uint      `json:"id" gorm:"primaryKey"`
+	ProjectId uint      `json:"projectId"`
+	Name      string    `json:"string"`
+	Mb        float64   `json:"mb"`
+	Location  string    `json:"location"`
+	CreatedAt time.Time `json:"createdAt"`
 }
