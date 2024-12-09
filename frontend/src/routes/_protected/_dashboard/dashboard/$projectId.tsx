@@ -8,6 +8,10 @@ import { Cog, Files } from 'lucide-react';
 import { z } from 'zod';
 import SettingsBlock from './-components/SettingsBlock';
 import FilesBlock from './-components/FilesBlock';
+import { useRef } from 'react';
+import { Input } from '@/components/ui/input';
+import { toast } from '@/hooks/use-toast';
+import { fileSchema } from '@/lib/validators/files';
 
 export const Route = createFileRoute(
   '/_protected/_dashboard/dashboard/$projectId',
@@ -46,10 +50,18 @@ export const Route = createFileRoute(
       throw redirect({ to: '/dashboard' });
     }
 
+    const fileData = z.array(fileSchema).safeParse(projectRes.data.files);
+    if (!fileData.success) {
+      console.error(error);
+      throw redirect({ to: '/dashboard' });
+    }
+
     return {
       project: data,
       filesCount: projectRes.data.filesCount,
       token: tokenRes.data.token,
+      publicKey: tokenRes.data.publicKey,
+      files: fileData.data,
     };
   },
 });
@@ -76,12 +88,48 @@ const sidebarNavLinks = [
 ];
 
 function RouteComponent() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { b } = Route.useSearch();
-  const { project, token } = Route.useLoaderData();
+  const { project, token, publicKey, files } = Route.useLoaderData();
 
   const blocks: Record<string, JSX.Element> = {
-    settings: <SettingsBlock token={token} />,
-    files: <FilesBlock />,
+    settings: <SettingsBlock publicKey={publicKey} token={token} />,
+    files: <FilesBlock files={files} />,
+  };
+
+  const handleUpload = async () => {
+    if (!fileInputRef) return;
+    if (!fileInputRef.current) return;
+    if (!fileInputRef.current.files) return;
+
+    const file = fileInputRef.current.files[0];
+
+    const res = await axios.postForm(
+      '/api/u/upload',
+      {
+        name: 'yo',
+        projectId: project.id,
+        file: file,
+      },
+      {
+        headers: {
+          kl_token: token,
+          kl_key: publicKey,
+        },
+      },
+    );
+    if (res.status !== 200) {
+      toast({
+        title: res.data.message,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    toast({
+      title: 'Успешно загружено!',
+    });
+    return;
   };
 
   return (
@@ -109,7 +157,11 @@ function RouteComponent() {
             ))}
           </nav>
         </div>
-        <div className="col-span-5 pl-2">{blocks[b]}</div>
+        <div className="col-span-5 pl-2">
+          {/* <Button onClick={handleUpload}>Загрузить</Button>
+          <Input type="file" ref={fileInputRef} /> */}
+          {blocks[b]}
+        </div>
       </div>
     </div>
   );

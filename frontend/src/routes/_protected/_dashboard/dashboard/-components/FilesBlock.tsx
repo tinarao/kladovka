@@ -1,7 +1,7 @@
-import React from 'react';
+import { FileFields, FileKl } from '@/lib/validators/files';
 
-const FilesBlock = () => {
-  return <div>FilesBlock</div>;
+const FilesBlock = ({ files }: { files: Array<FileKl> }) => {
+  return <div>{files.length}</div>;
 };
 
 export default FilesBlock;
