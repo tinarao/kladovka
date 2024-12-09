@@ -1,7 +1,6 @@
+import ClickToCopyButton from '@/components/ClickToCopyButton';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/hooks/use-toast';
-import { ClipboardPlus, ClipboardX, Key } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { GlobeLock, Key } from 'lucide-react';
 
 const SettingsBlock = ({
   token,
@@ -10,36 +9,46 @@ const SettingsBlock = ({
   token: string;
   publicKey: string;
 }) => {
-  const [isTokenCopied, setIsTokenCopied] = useState(false);
+  const code = `import { KL_TOKEN, KL_KEY } from "@/lib/kladovka"
 
-  const copyToken = async () => {
-    await navigator.clipboard.writeText(token).then((v) => {
-      toast({ title: 'Скопировано!' });
-      setIsTokenCopied(true);
+export async function handleUpload(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
 
-      setTimeout(() => {
-        setIsTokenCopied(false);
-      }, 5000);
-    });
-  };
+  const res = await fetch('/upload', {
+    body: formData,
+    headers: {
+      kl_token: 'KL_TOKEN',
+      kl_key: 'KL_KEY',
+    },
+  });
+}`;
 
   return (
     <div className="flex h-full flex-col justify-between">
-      <div>
-        <h3 className="text-2xl font-medium">Ключи</h3>
-        <Button
-          className={
-            isTokenCopied
-              ? 'bg-green-500 text-white hover:bg-green-500 hover:text-white'
-              : ''
-          }
-          onClick={copyToken}
-          variant="ghost"
-        >
-          {isTokenCopied ? <ClipboardPlus /> : <Key />}
-          Скопировано!
-        </Button>
+      <div className="flex-1 space-y-4">
+        <div>
+          <h3 className="text-2xl font-medium">Ключи</h3>
+          <div className="grid gap-y-1">
+            <ClickToCopyButton dataToCopy={token}>
+              <Key /> Токен
+            </ClickToCopyButton>
+            <ClickToCopyButton dataToCopy={publicKey}>
+              <GlobeLock /> Ключ
+            </ClickToCopyButton>
+          </div>
+        </div>
+        <div>
+          <h3 className="text-2xl font-medium">Пример использования</h3>
+          <div>
+            <span>Upload.ts</span>
+            <pre className="code rounded-sm bg-neutral-800 p-2 text-white">
+              {code}
+            </pre>
+          </div>
+        </div>
       </div>
+
       <div>
         <h3 className="text-2xl font-medium">Опасные действия</h3>
         <div className="flex justify-between rounded-md bg-red-50 px-4 py-2">
