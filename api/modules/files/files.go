@@ -44,10 +44,6 @@ func Upload(c *gin.Context) {
 		return
 	}
 
-	// 1. Get token out of request headers
-	// 2. project = db.Project.Find(where token == token)
-	// 3. File.Create(project = project.id)
-
 	fi, err := f.File.Open()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Внутренняя ошибка сервера при работе с файлом"})

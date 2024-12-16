@@ -14,8 +14,7 @@ func Token(c *gin.Context) {
 	token := c.GetHeader("kl_token")
 	publicKey := c.GetHeader("kl_key")
 	if token == "" || publicKey == "" {
-		c.Status(http.StatusUnauthorized)
-		c.Abort()
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Invalid auth data provided"})
 		return
 	}
 
