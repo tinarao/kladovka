@@ -8,14 +8,23 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { kladowka } from '@/lib/uploads';
 import { FileKl } from '@/lib/validators/files';
 import { useParams } from '@tanstack/react-router';
-import { Upload } from 'lucide-react';
+import { Download, Upload } from 'lucide-react';
 
 const FilesBlock = ({ files }: { files: Array<FileKl> }) => {
   const { projectId } = useParams({
     from: '/_protected/_dashboard/dashboard/$projectId',
   });
+
+  const handleFileRequest = async (fileId: number) => {
+    const res = await kladowka.getSignedUrl(fileId);
+    if (res.ok) {
+      const url = `http://localhost:8080/api/signed/${res.alias}`;
+      window.location.href = url;
+    }
+  };
 
   return (
     <>
@@ -38,7 +47,8 @@ const FilesBlock = ({ files }: { files: Array<FileKl> }) => {
             <TableHead className="w-[100px]">ID</TableHead>
             <TableHead>Название</TableHead>
             <TableHead>Размер</TableHead>
-            <TableHead className="text-right">Дата создания</TableHead>
+            <TableHead>Дата создания</TableHead>
+            <TableHead className="text-right">Скачать</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -47,8 +57,18 @@ const FilesBlock = ({ files }: { files: Array<FileKl> }) => {
               <TableCell className="font-medium">{f.id}</TableCell>
               <TableCell>{f.name}</TableCell>
               <TableCell className="w-32">{f.mb} Мб.</TableCell>
-              <TableCell className="w-48 text-right">
+              <TableCell className="w-48">
                 {Intl.DateTimeFormat('ru-RU').format(new Date(f.createdAt))}
+              </TableCell>
+              <TableCell className="w-16 justify-end text-right">
+                <Button
+                  size="icon"
+                  onClick={() => handleFileRequest(f.id)}
+                  variant="ghost"
+                  className="size-8 rounded-full hover:bg-neutral-400 hover:text-white"
+                >
+                  <Download />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

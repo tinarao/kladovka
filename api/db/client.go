@@ -19,6 +19,7 @@ func Connect() {
 		&User{},
 		&Project{},
 		&File{},
+		&SignedUrl{},
 	); err != nil {
 		log.Fatalf("failed to run automigrations: %s", err)
 	}

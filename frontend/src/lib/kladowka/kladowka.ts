@@ -58,4 +58,21 @@ export class Kladowka {
         const response = this.handleSingleFileUpload(projectId, files[0]);
         return response;
     }
+
+    public async getSignedUrl(fileId: number) {
+        const response = await axios.get(
+            `/api/u/url/${fileId}`,
+            {
+                headers: {
+                    kl_token: this.token,
+                    kl_key: this.key,
+                },
+            },
+        );
+        if (response.status !== 200) {
+            return { ok: false }
+        }
+
+        return { ok: true, alias: response.data.signedUrl }
+    }
 }

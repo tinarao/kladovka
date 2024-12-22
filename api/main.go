@@ -26,9 +26,12 @@ func main() {
 	r := gin.Default()
 
 	api := r.Group("/api")
+	api.GET("/signed/:alias", files.HandleSignedUrlVisit)
+
 	a := api.Group("/auth")
 
 	u := api.Group("/u", middleware.Token)
+	u.GET("/url/:id", files.GetSignedUrl)
 	u.POST("/upload", files.Upload)
 
 	v := api.Group("/v", middleware.AuthMiddleware)

@@ -40,3 +40,9 @@ type File struct {
 	Location  string    `json:"location"`
 	CreatedAt time.Time `json:"createdAt"`
 }
+
+type SignedUrl struct {
+	ID     uint `gorm:"primaryKey"`
+	FileId uint
+	Alias  string
+}
